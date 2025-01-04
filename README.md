@@ -9,6 +9,10 @@ npm install node-sht20
 ```
 
 ```sh
+pnpm add node-sht20
+```
+
+```sh
 yarn add node-sht20
 ```
 

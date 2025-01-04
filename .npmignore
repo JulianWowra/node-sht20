@@ -1,10 +1,8 @@
-.git
-.editorconfig
-.gitignore
-.npmignore
-.prettierrc.js
-.eslintrc.js
-yarn.lock
-tsconfig.json
-src
-node_modules
+# Ignore everything by default
+*
+
+# Include specific directories and files
+!dist/**/*
+!LICENSE
+!package.json
+!README.md
