@@ -1,7 +1,7 @@
 {
 	"name": "node-sht20",
 	"description": "Library to work with a SHT20 chip via i2c",
-	"version": "1.0.3",
+	"version": "2.0.0",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"repository": "https://github.com/JulianWowra/node-sht20",
