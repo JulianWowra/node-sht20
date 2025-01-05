@@ -1,18 +1,18 @@
-# node-SHT20
+# node-sht20
 
 [![NPM](https://nodei.co/npm/node-sht20.png)](https://npmjs.org/package/node-sht20)
 
 ## Install
 
-```sh
+```text
 npm install node-sht20
 ```
 
-```sh
-pnpm add node-sht20
+```text
+pnpm install node-sht20
 ```
 
-```sh
+```text
 yarn add node-sht20
 ```
 
@@ -23,44 +23,20 @@ Usage in TypeScript (with ES Modules):
 ```typescript
 import SHT20 from 'node-sht20';
 
-const sensor = new SHT20({
-	bus: 1
-});
+const sensor = new SHT20({ bus: 1 });
 
 async function start() {
-	const { temperature, humidity } = await sensor.read();
+  const { temperature, humidity } = await sensor.read();
 
-	console.log(`Temperature: ${temperature.value} ${temperature.unit}`);
-	console.log(`Humidity: ${humidity.value} ${humidity.unit}`);
+  console.log(`Temperature: ${temperature.value} ${temperature.unit}`);
+  console.log(`Humidity: ${humidity.value} ${humidity.unit}`);
 
-	// Temperature in another unit
+  // Temperature in another unit
 
-	const degreeFahrenheit = temperature.toFahrenheit();
-	console.log(`Temperature: ${degreeFahrenheit.value} ${degreeFahrenheit.unit}`);
-}
+  const degreeFahrenheit = temperature.toFahrenheit();
+  console.log(`Temperature: ${degreeFahrenheit.value} ${degreeFahrenheit.unit}`);
 
-start();
-```
-
-Usage in JavaScript (with CommonJS):
-
-```js
-const nodeSHT20 = require('node-sht20');
-
-const sensor = new nodeSHT20.SHT20({
-	bus: 1
-});
-
-async function start() {
-	const { temperature, humidity } = await sensor.read();
-
-	console.log(`Temperature: ${temperature.value} ${temperature.unit}`);
-	console.log(`Humidity: ${humidity.value} ${humidity.unit}`);
-
-	// Temperature in another unit
-
-	const degreeFahrenheit = temperature.toFahrenheit();
-	console.log(`Temperature: ${degreeFahrenheit.value} ${degreeFahrenheit.unit}`);
+  await sensor.close();
 }
 
 start();

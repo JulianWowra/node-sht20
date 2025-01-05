@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const nodeSHT20 = require('../../dist/index');
+const { SHT20 } = require('../../dist/index');
 
-const sensor = new nodeSHT20.SHT20({
-	bus: 1
-});
+const sensor = new SHT20({ bus: 1 });
 
 async function start() {
 	const { temperature, humidity } = await sensor.read();
@@ -15,6 +12,8 @@ async function start() {
 
 	const degreeFahrenheit = temperature.toFahrenheit();
 	console.log(`Temperature: ${degreeFahrenheit.value} ${degreeFahrenheit.unit}`);
+
+	await sensor.close();
 }
 
 start();
