@@ -3,6 +3,8 @@ import SHT20 from '../../dist/index';
 const sensor = new SHT20({ bus: 1 });
 
 async function start() {
+	await sensor.open();
+
 	const { temperature, humidity } = await sensor.read();
 
 	console.log(`Temperature: ${temperature.value} ${temperature.unit}`);

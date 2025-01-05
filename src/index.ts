@@ -72,14 +72,14 @@ export class SHT20 {
 	 * Opens the I2C bus connection
 	 * @returns Resolves when the connection is successfully opened
 	 */
-	async open(openOptions: Parameters<typeof openI2CConnection>[1]) {
+	async open(openOptions?: Parameters<typeof openI2CConnection>[1]) {
 		this.wire = await new Promise<I2CBus>((resolve, reject) => {
 			if (this.wire) {
 				return reject(new Error('Connection already open.'));
 			}
 
 			resolve(
-				openI2CConnection(this.bus, openOptions, (error: Error) => {
+				openI2CConnection(this.bus, openOptions || { forceAccess: false }, (error: Error) => {
 					if (error) {
 						reject(error);
 					}
