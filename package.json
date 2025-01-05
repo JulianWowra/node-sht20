@@ -4,9 +4,9 @@
 	"version": "1.0.3",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
-	"repository": "https://github.com/KillerJulian/node-sht20",
-	"homepage": "https://killerjulian.github.io/node-sht20",
-	"author": "KillerJulian <info@killerjulian.de>",
+	"repository": "https://github.com/JulianWowra/node-sht20",
+	"homepage": "https://julianwowra.github.io/node-sht20",
+	"author": "Julian Wowra <development@julianwowra.de>",
 	"license": "MIT",
 	"publishConfig": {
 		"provenance": true

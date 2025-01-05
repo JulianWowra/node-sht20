@@ -70,10 +70,10 @@ start();
 
 ## Author
 
-👤 **KillerJulian <info@killerjulian.de>**
+👤 **Julian Wowra <development@julianwowra.de>**
 
-- Github: [@KillerJulian](https://github.com/KillerJulian)
+- Github: [@JulianWowra](https://github.com/JulianWowra)
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/KillerJulian/node-sht20/issues). You can also take a look at the [contributing guide](https://github.com/KillerJulian/node-sht20/blob/master/CONTRIBUTING.md).
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/JulianWowra/node-sht20/issues). You can also take a look at the [contributing guide](https://github.com/JulianWowra/node-sht20/blob/main/CONTRIBUTING.md).
