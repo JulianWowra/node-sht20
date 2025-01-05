@@ -1,18 +1,16 @@
-export const sleep = (ms: number) => {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-};
+import { openSync } from 'i2c-bus';
 
 export enum TemperatureUnits {
-	degreeCelsius = '°C',
-	degreesFahrenheit = '°F',
-	kelvin = 'K'
+	DEGREE_CELSIUS = '°C',
+	DEGREES_FAHRENHEIT = '°F',
+	KELVIN = 'K'
 }
 
 export class Temperature {
 	readonly value: number;
 	readonly unit: TemperatureUnits;
 
-	constructor(value: number, unit = TemperatureUnits.degreeCelsius) {
+	constructor(value: number, unit = TemperatureUnits.DEGREE_CELSIUS) {
 		this.value = value;
 		this.unit = unit;
 	}
@@ -23,11 +21,11 @@ export class Temperature {
 
 	toCelsius() {
 		switch (this.unit) {
-			case TemperatureUnits.degreesFahrenheit: {
-				return new Temperature(((this.value - 32) * 5) / 9, TemperatureUnits.degreeCelsius);
+			case TemperatureUnits.DEGREES_FAHRENHEIT: {
+				return new Temperature(((this.value - 32) * 5) / 9, TemperatureUnits.DEGREE_CELSIUS);
 			}
-			case TemperatureUnits.kelvin: {
-				return new Temperature(this.value - 273.15, TemperatureUnits.degreeCelsius);
+			case TemperatureUnits.KELVIN: {
+				return new Temperature(this.value - 273.15, TemperatureUnits.DEGREE_CELSIUS);
 			}
 			default:
 				return this;
@@ -36,11 +34,11 @@ export class Temperature {
 
 	toFahrenheit() {
 		switch (this.unit) {
-			case TemperatureUnits.degreeCelsius: {
-				return new Temperature((this.value * 9) / 5 + 32, TemperatureUnits.degreesFahrenheit);
+			case TemperatureUnits.DEGREE_CELSIUS: {
+				return new Temperature((this.value * 9) / 5 + 32, TemperatureUnits.DEGREES_FAHRENHEIT);
 			}
-			case TemperatureUnits.kelvin: {
-				return new Temperature(((this.value - 273, 15) * 9) / 5 + 32, TemperatureUnits.degreesFahrenheit);
+			case TemperatureUnits.KELVIN: {
+				return new Temperature(((this.value - 273, 15) * 9) / 5 + 32, TemperatureUnits.DEGREES_FAHRENHEIT);
 			}
 			default:
 				return this;
@@ -49,11 +47,11 @@ export class Temperature {
 
 	toKelvin() {
 		switch (this.unit) {
-			case TemperatureUnits.degreeCelsius: {
-				return new Temperature(this.value + 273.15, TemperatureUnits.kelvin);
+			case TemperatureUnits.DEGREE_CELSIUS: {
+				return new Temperature(this.value + 273.15, TemperatureUnits.KELVIN);
 			}
-			case TemperatureUnits.degreesFahrenheit: {
-				return new Temperature(((this.value - 32) * 5) / 9 + 273.15, TemperatureUnits.kelvin);
+			case TemperatureUnits.DEGREES_FAHRENHEIT: {
+				return new Temperature(((this.value - 32) * 5) / 9 + 273.15, TemperatureUnits.KELVIN);
 			}
 			default:
 				return this;
@@ -61,12 +59,17 @@ export class Temperature {
 	}
 }
 
+export enum HumidityUnits {
+	PERCENT = '%'
+}
+
 export class Humidity {
 	readonly value: number;
-	readonly unit = '%';
+	readonly unit: HumidityUnits;
 
-	constructor(value: number) {
+	constructor(value: number, unit = HumidityUnits.PERCENT) {
 		this.value = value;
+		this.unit = unit;
 	}
 
 	rounded(decimalPlaces = 1) {
@@ -74,58 +77,60 @@ export class Humidity {
 	}
 }
 
-export function round(value: number, decimalPlaces: number) {
-	if (value % 1 != 0) {
-		const i = Math.pow(10, decimalPlaces);
-		return Math.round((value + Number.EPSILON) * i) / i;
-	}
+export function scanBus(bus: number) {
+	const wire = openSync(bus);
+	const result = wire.scanSync();
 
-	return value;
+	wire.closeSync();
+	return result;
 }
 
 /**
- * @author https://github.com/bbx10/node-htu21d/blob/135e81b53ab5e98282cb16ea9d27ce193dc9bf0a/index.js#L82
  */
-export function calcTemp(data: Buffer) {
-	if (data.length === 3 && calcCRC8(data, 3)) {
-		const rawtemp = ((data[0] << 8) | data[1]) & 0xfffc;
-		const temperature = (rawtemp / 65536.0) * 175.72 - 46.85;
+export function sleep(ms: number) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-		return round(temperature, 2);
+export function round(value: number, decimalPlaces: number): number {
+	if (!isFinite(value) || decimalPlaces < 0) {
+		throw new Error('Invalid input for rounding!');
 	}
 
-	throw new Error('The read data are invalid!');
+	const factor = Math.pow(10, decimalPlaces);
+	return Math.round((value + Number.EPSILON) * factor) / factor;
 }
 
 /**
- * @author https://github.com/bbx10/node-htu21d/blob/135e81b53ab5e98282cb16ea9d27ce193dc9bf0a/index.js#L109
  */
-export function calcHumi(data: Buffer) {
-	if (data.length === 3 && calcCRC8(data, 3)) {
-		const rawhumi = ((data[0] << 8) | data[1]) & 0xfffc;
-		const humidity = (rawhumi / 65536.0) * 125.0 - 6.0;
-
-		return round(humidity, 1);
+export function extractRawValue(buffer: Buffer): number {
+	// Ensure the buffer has the correct length
+	if (buffer.length !== 3) {
+		throw new Error('The read data are invalid! Expected 3 bytes.');
 	}
 
-	throw new Error('The read data are invalid!');
+	// Validate the CRC checksum
+	if (!validateCRC(buffer)) {
+		throw new Error('CRC check failed: The read data are invalid!');
+	}
+
+	// Extract and return the raw value (mask out status bits)
+	return ((buffer[0] << 8) | buffer[1]) & 0xfffc;
 }
 
 /**
- * @author https://github.com/bbx10/node-htu21d/blob/135e81b53ab5e98282cb16ea9d27ce193dc9bf0a/index.js#L129
  */
-function calcCRC8(buf: Buffer, len: number) {
-	let dataAndCRC;
+function validateCRC(buffer: Buffer): boolean {
+	let crc = 0;
 
-	if (len === null) return -1;
-	if (len != 3) return -1;
-	if (buf === null) return -1;
+	// Calculate the CRC over the first 2 bytes
+	for (const byte of buffer.subarray(0, 2)) {
+		crc ^= byte;
 
-	dataAndCRC = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8);
-	for (let i = 0; i < 24; i++) {
-		if (dataAndCRC & 0x80000000) dataAndCRC ^= 0x98800000;
-		dataAndCRC <<= 1;
+		for (let i = 0; i < 8; i++) {
+			crc = crc & 0x80 ? (crc << 1) ^ 0x31 : crc << 1;
+		}
 	}
 
-	return dataAndCRC === 0;
+	// Compare the calculated CRC with the provided one
+	return (crc & 0xff) === buffer[2];
 }
