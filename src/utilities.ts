@@ -1,11 +1,17 @@
 import { openSync } from 'i2c-bus';
 
+/**
+ * Represents the possible units of the temperature
+ */
 export enum TemperatureUnits {
 	DEGREE_CELSIUS = '°C',
 	DEGREES_FAHRENHEIT = '°F',
 	KELVIN = 'K'
 }
 
+/**
+ * Represents the temperature
+ */
 export class Temperature {
 	readonly value: number;
 	readonly unit: TemperatureUnits;
@@ -59,10 +65,16 @@ export class Temperature {
 	}
 }
 
+/**
+ * Represents the posible units of the humidity
+ */
 export enum HumidityUnits {
 	PERCENT = '%'
 }
 
+/**
+ * Represents the humidity
+ */
 export class Humidity {
 	readonly value: number;
 	readonly unit: HumidityUnits;
@@ -77,6 +89,13 @@ export class Humidity {
 	}
 }
 
+/**
+ * Returns an array of numbers, where each number represents the I2C address of a detected device
+ * @see https://github.com/fivdi/i2c-bus#busscansyncstartaddr-endaddr
+ *
+ * @param bus The number of the I2C bus
+ * @returns An array of detected I2C addresses
+ */
 export function scanBus(bus: number) {
 	const wire = openSync(bus);
 	const result = wire.scanSync();
@@ -86,11 +105,20 @@ export function scanBus(bus: number) {
 }
 
 /**
+ * Pauses the execution for a specified amount of time
+ * @param ms The time to sleep in milliseconds
+ * @returns A promise that resolves after the specified amount of time
  */
 export function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Rounds a number to a specified number of decimal places
+ * @param value The number to round
+ * @param decimalPlaces The number of decimal places
+ * @returns The rounded number
+ */
 export function round(value: number, decimalPlaces: number): number {
 	if (!isFinite(value) || decimalPlaces < 0) {
 		throw new Error('Invalid input for rounding!');
@@ -101,6 +129,9 @@ export function round(value: number, decimalPlaces: number): number {
 }
 
 /**
+ * Validates the read data and extracts the raw value for the temperature or humidity
+ * @param buffer The read data as a Buffer (expected length: 3 bytes)
+ * @returns The raw value for the temperature or humidity
  */
 export function extractRawValue(buffer: Buffer): number {
 	// Ensure the buffer has the correct length
@@ -118,6 +149,9 @@ export function extractRawValue(buffer: Buffer): number {
 }
 
 /**
+ * Validates the CRC checksum for the given data buffer
+ * @param buffer The data buffer (2 data bytes + 1 CRC byte)
+ * @returns True if the CRC is valid, otherwise false
  */
 function validateCRC(buffer: Buffer): boolean {
 	let crc = 0;
